@@ -8,15 +8,16 @@ interface Tarefa {
   data_fim?: Date;
   conteudo?: string;
   status?: string;
+  prioridade?: 'baixa' | 'media' | 'alta';
 }
 
 export const cadastrarTarefa = (db: Connection, tarefa: Tarefa): Promise<void> => {
   return new Promise((resolve, reject) => {
     const query = `
-      INSERT INTO tarefas (id_categoria, id_workspace, titulo, data_inicio, data_fim, conteudo, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO tarefas (id_categoria, id_workspace, titulo, data_inicio, data_fim, conteudo, status, prioridade)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    db.query(query, [tarefa.id_categoria, tarefa.id_workspace, tarefa.titulo, tarefa.data_inicio, tarefa.data_fim, tarefa.conteudo, tarefa.status], (err) => {
+    db.query(query, [tarefa.id_categoria, tarefa.id_workspace, tarefa.titulo, tarefa.data_inicio, tarefa.data_fim, tarefa.conteudo, tarefa.status, tarefa.prioridade], (err) => {
       if (err) {
         return reject(`Erro ao cadastrar a tarefa: ${err.message}`);
       }
@@ -29,10 +30,10 @@ export const editarTarefa = (db: Connection, id_tarefa: number, tarefa: Tarefa):
   return new Promise((resolve, reject) => {
     const query = `
       UPDATE tarefas
-      SET id_categoria = ?, id_workspace = ?, titulo = ?, data_inicio = ?, data_fim = ?, conteudo = ?, status = ?
+      SET id_categoria = ?, id_workspace = ?, titulo = ?, data_inicio = ?, data_fim = ?, conteudo = ?, status = ?, prioridade = ?
       WHERE id_tarefa = ?
     `;
-    db.query(query, [tarefa.id_categoria, tarefa.id_workspace, tarefa.titulo, tarefa.data_inicio, tarefa.data_fim, tarefa.conteudo, tarefa.status, id_tarefa], (err) => {
+    db.query(query, [tarefa.id_categoria, tarefa.id_workspace, tarefa.titulo, tarefa.data_inicio, tarefa.data_fim, tarefa.conteudo, tarefa.status, tarefa.prioridade, id_tarefa], (err) => {
       if (err) {
         return reject(`Erro ao editar a tarefa: ${err.message}`);
       }
