@@ -45,12 +45,12 @@ connection.connect((err) => {
   }
 });
 
-// const server = app.listen(port, '192.168.247.119', () => {
-//   console.log(`Servidor rodando em http://192.168.247.119:${port}`);
+// const server = app.listen(port, '192.168.15.12', () => {
+//   console.log(`Servidor rodando em http://192.168.15.12:${port}`); // IP WiFi
 // });
 
-const server = app.listen(port, '192.168.15.12', () => {
-  console.log(`Servidor rodando em http://192.168.15.12:${port}`);
+const server = app.listen(port, '192.168.247.119', () => {
+  console.log(`Servidor rodando em http://192.168.247.119:${port}`); // IP celular
 });
 
 server.on('error', (err) => {

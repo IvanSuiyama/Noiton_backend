@@ -130,3 +130,14 @@ export const verificarWorkspaceUsuario = (db: Connection, cpf: string): Promise<
     });
   });
 };
+
+// Função para listar todos os usuários
+export const listarUsuarios = (db: Connection): Promise<any[]> => {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT * FROM usuarios';
+    db.query(query, (err, results: any) => {
+      if (err) return reject(`Erro ao listar usuários: ${err.message}`);
+      resolve(results);
+    });
+  });
+};

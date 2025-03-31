@@ -46,3 +46,12 @@ export const verificarWorkspaceUsuario = async (req: Request, res: Response) => 
     res.status(400).send(error);
   }
 };
+
+export const listarUsuarios = async (req: Request, res: Response) => {
+  try {
+    const usuarios = await usuarioService.listarUsuarios(connection);
+    res.status(200).json(usuarios);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};

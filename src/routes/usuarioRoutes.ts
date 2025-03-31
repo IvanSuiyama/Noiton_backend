@@ -8,5 +8,6 @@ router.post('/login', usuarioController.loginUsuario);
 router.put('/usuario/:cpf', usuarioController.atualizarUsuario);
 router.delete('/usuario/:cpf', usuarioController.deletarUsuario);
 router.get('/usuario/:cpf/workspace', usuarioController.verificarWorkspaceUsuario);
+router.get('/usuario/list', usuarioController.listarUsuarios);
 
 export default router;
