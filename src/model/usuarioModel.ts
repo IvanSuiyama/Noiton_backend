@@ -30,3 +30,13 @@ export const createUsuarioTable = (db: Connection) => {
     }
   });
 };
+
+export const dropUsuarioTable = (db: Connection) => {
+  const query = `DROP TABLE IF EXISTS usuarios;`;
+
+  db.query(query, (err) => {
+    if (err) {
+      console.error('Erro ao excluir a tabela de usuários:', err);
+    }
+  });
+};

@@ -21,3 +21,13 @@ export const createWorkspaceTable = (db: Connection) => {
     }
   });
 };
+
+export const dropWorkspaceTable = (db: Connection) => {
+  const query = `DROP TABLE IF EXISTS workspaces;`;
+
+  db.query(query, (err) => {
+    if (err) {
+      console.error('Erro ao excluir a tabela de workspaces:', err);
+    }
+  });
+};

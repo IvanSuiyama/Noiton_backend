@@ -1,8 +1,8 @@
 import express from 'express';
-import { createUsuarioTable } from './model/usuarioModel';
-import { createWorkspaceTable } from './model/workModel';
-import { CreateTarefaTable } from './model/tarefasModel';
-import { createCategoriaTable } from './model/categoriaModel';
+import { createUsuarioTable, dropUsuarioTable } from './model/usuarioModel';
+import { createWorkspaceTable, dropWorkspaceTable } from './model/workModel';
+import { CreateTarefaTable, dropTarefaTable } from './model/tarefasModel';
+import { createCategoriaTable, dropCategoriaTable } from './model/categoriaModel';
 import connection from './config/database';
 import workspaceRoutes from './routes/workspaceRoutes';
 import usuarioRoutes from './routes/usuarioRoutes';
@@ -28,30 +28,30 @@ connection.connect((err) => {
   console.log('Conectado com sucesso no banco de dados');
 
   try {
-    console.log('Criando tabela "workspaces"...');
+    // console.log('Excluindo tabelas existentes...');
+    // dropTarefaTable(connection);
+    // dropCategoriaTable(connection);
+    // dropUsuarioTable(connection);
+    // dropWorkspaceTable(connection);
+
+    console.log('Criando tabelas...');
     createWorkspaceTable(connection);
-
-    console.log('Criando tabela "usuario"...');
     createUsuarioTable(connection);
-
-    console.log('Criando tabela "categorias"...');
     createCategoriaTable(connection);
-
-    console.log('Criando tabela "tarefas"...');
     CreateTarefaTable(connection);
 
   } catch (error) {
-    console.error('Erro ao criar tabelas:', error);
+    console.error('Erro ao recriar tabelas:', error);
   }
 });
 
-// const server = app.listen(port, '192.168.15.12', () => {
-//   console.log(`Servidor rodando em http://192.168.15.12:${port}`); // IP WiFi
-// });
-
-const server = app.listen(port, '192.168.247.119', () => {
-  console.log(`Servidor rodando em http://192.168.247.119:${port}`); // IP celular
+const server = app.listen(port, '192.168.15.12', () => {
+  console.log(`Servidor rodando em http://192.168.15.12:${port}`); // IP WiFi
 });
+
+// const server = app.listen(port, '192.168.247.119', () => {
+//   console.log(`Servidor rodando em http://192.168.247.119:${port}`); // IP celular
+// });
 
 server.on('error', (err) => {
   const error = err as NodeJS.ErrnoException; // Use type assertion para acessar 'code'
