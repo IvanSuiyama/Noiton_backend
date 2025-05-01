@@ -11,10 +11,11 @@ export const cadastrarUsuario = async (req: Request, res: Response) => {
   }
 };
 
+// Função para realizar login
 export const loginUsuario = async (req: Request, res: Response) => {
   try {
-    const token = await usuarioService.loginUsuario(connection, req.body.email, req.body.senha);
-    res.status(200).json({ token });
+    const { token, cpf } = await usuarioService.loginUsuario(connection, req.body.email, req.body.senha); // Receba o CPF
+    res.status(200).json({ token, cpf }); // Inclua o CPF na resposta
   } catch (error) {
     res.status(400).send(error);
   }
@@ -53,5 +54,14 @@ export const listarUsuarios = async (req: Request, res: Response) => {
     res.status(200).json(usuarios);
   } catch (error) {
     res.status(400).send(error);
+  }
+};
+
+export const buscarUsuarioPorCPF = async (req: Request, res: Response) => {
+  try {
+    const usuario = await usuarioService.buscarUsuarioPorCPF(connection, req.params.cpf);
+    res.status(200).json(usuario);
+  } catch (error) {
+    res.status(404).send(error);
   }
 };

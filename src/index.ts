@@ -45,8 +45,8 @@ connection.connect((err) => {
   }
 });
 
-const server = app.listen(port, '192.168.15.12', () => {
-  console.log(`Servidor rodando em http://192.168.15.12:${port}`); // IP WiFi
+const server = app.listen(port, '192.168.15.11', () => {
+  console.log(`Servidor rodando em http:// 192.168.15.11:${port}`); // IP WiFi
 });
 
 // const server = app.listen(port, '192.168.247.119', () => {

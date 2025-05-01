@@ -70,18 +70,19 @@ export const cadastrarUsuario = (db: Connection, usuario: any): Promise<void> =>
   });
 };
 
-// Função para realizar login
-export const loginUsuario = (db: Connection, email: string, senha: string): Promise<string> => {
+
+export const loginUsuario = (db: Connection, email: string, senha: string): Promise<{ token: string; cpf: string }> => {
   return new Promise((resolve, reject) => {
-    const query = 'SELECT senha FROM usuarios WHERE email = ?';
+    const query = 'SELECT cpf, senha FROM usuarios WHERE email = ?';
     db.query(query, [email], (err, results: any) => {
       if (err) return reject(`Erro ao buscar o usuário: ${err.message}`);
       if (results.length === 0) return reject('Usuário não encontrado.');
 
-      bcrypt.compare(senha, results[0].senha, (err, isMatch) => {
+      const { cpf, senha: hashedSenha } = results[0];
+      bcrypt.compare(senha, hashedSenha, (err, isMatch) => {
         if (err || !isMatch) return reject('Senha incorreta.');
-        const token = jwt.sign({ email }, 'secreto', { expiresIn: '1h' });
-        resolve(token);
+        const token = jwt.sign({ email, cpf }, 'secreto', { expiresIn: '1h' });
+        resolve({ token, cpf });
       });
     });
   });
@@ -92,14 +93,23 @@ export const atualizarUsuario = (db: Connection, cpf: string, dados: any): Promi
   return new Promise(async (resolve, reject) => {
     try {
       const { email, nome, telefone, senha } = dados;
-      const hash = await criptografarSenha(senha);
 
-      const query = `
+      let query = `
         UPDATE usuarios
-        SET email = ?, nome = ?, telefone = ?, senha = ?
-        WHERE cpf = ?
+        SET email = ?, nome = ?, telefone = ?
       `;
-      db.query(query, [email, nome, telefone, hash, cpf], (err) => {
+      const params: any[] = [email, nome, telefone];
+
+      if (senha) {
+        const hash = await criptografarSenha(senha);
+        query += `, senha = ?`;
+        params.push(hash);
+      }
+
+      query += ` WHERE cpf = ?`;
+      params.push(cpf);
+
+      db.query(query, params, (err) => {
         if (err) return reject(`Erro ao atualizar o usuário: ${err.message}`);
         resolve();
       });
@@ -138,6 +148,18 @@ export const listarUsuarios = (db: Connection): Promise<any[]> => {
     db.query(query, (err, results: any) => {
       if (err) return reject(`Erro ao listar usuários: ${err.message}`);
       resolve(results);
+    });
+  });
+};
+
+// Função para buscar os dados de um usuário pelo CPF
+export const buscarUsuarioPorCPF = (db: Connection, cpf: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT * FROM usuarios WHERE cpf = ?';
+    db.query(query, [cpf], (err, results: any) => {
+      if (err) return reject(`Erro ao buscar o usuário: ${err.message}`);
+      if (results.length === 0) return reject('Usuário não encontrado.');
+      resolve(results[0]);
     });
   });
 };
