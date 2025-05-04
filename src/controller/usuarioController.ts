@@ -11,11 +11,10 @@ export const cadastrarUsuario = async (req: Request, res: Response) => {
   }
 };
 
-// Função para realizar login
 export const loginUsuario = async (req: Request, res: Response) => {
   try {
-    const { token, cpf } = await usuarioService.loginUsuario(connection, req.body.email, req.body.senha); // Receba o CPF
-    res.status(200).json({ token, cpf }); // Inclua o CPF na resposta
+    const { token, cpf } = await usuarioService.loginUsuario(connection, req.body.email, req.body.senha);
+    res.status(200).json({ token, cpf });
   } catch (error) {
     res.status(400).send(error);
   }

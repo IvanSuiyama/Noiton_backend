@@ -1,6 +1,7 @@
 import express from 'express';
 import { createUsuarioTable, dropUsuarioTable } from './model/usuarioModel';
-import { createWorkspaceTable, dropWorkspaceTable } from './model/workModel';
+import { createWorkspaceTable, dropWorkspaceTable, dropWorkspaceUsuariosTable } from './model/workModel';
+import { createWorkspaceUsuariosTable } from './model/workModel';
 import { CreateTarefaTable, dropTarefaTable } from './model/tarefasModel';
 import { createCategoriaTable, dropCategoriaTable } from './model/categoriaModel';
 import connection from './config/database';
@@ -11,7 +12,7 @@ import categoriaRoutes from './routes/categoriaRoutes';
 // import { AuthMiddleware } from './middleware/authMiddleware';
 
 const app = express();
-const port = parseInt(process.env.PORT || '4000', 10); // Converta para número
+const port = parseInt(process.env.PORT || '4000', 10);
 
 app.use(express.json());
 // app.use(AuthMiddleware); // Aplicar middleware de autenticação
@@ -32,12 +33,14 @@ connection.connect((err) => {
     // dropTarefaTable(connection);
     // dropCategoriaTable(connection);
     // dropUsuarioTable(connection);
+    // dropWorkspaceUsuariosTable(connection);
     // dropWorkspaceTable(connection);
 
     console.log('Criando tabelas...');
-    createWorkspaceTable(connection);
     createUsuarioTable(connection);
     createCategoriaTable(connection);
+    createWorkspaceTable(connection);
+    createWorkspaceUsuariosTable(connection);
     CreateTarefaTable(connection);
 
   } catch (error) {
@@ -45,8 +48,8 @@ connection.connect((err) => {
   }
 });
 
-const server = app.listen(port, '192.168.15.11', () => {
-  console.log(`Servidor rodando em http:// 192.168.15.11:${port}`); // IP WiFi
+const server = app.listen(port, '192.168.15.13', () => {
+  console.log(`Servidor rodando em http://192.168.15.13:${port}`); // IP WiFi
 });
 
 // const server = app.listen(port, '192.168.247.119', () => {
@@ -54,7 +57,7 @@ const server = app.listen(port, '192.168.15.11', () => {
 // });
 
 server.on('error', (err) => {
-  const error = err as NodeJS.ErrnoException; // Use type assertion para acessar 'code'
+  const error = err as NodeJS.ErrnoException;
   if (error.code === 'EADDRINUSE') {
     console.error(`Porta ${port} já está em uso. Tentando outra porta...`);
     const fallbackServer = app.listen(0, () => {

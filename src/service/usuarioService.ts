@@ -2,7 +2,7 @@ import { Connection } from 'mysql2';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-// Lógica para validar CPF com dígitos verificadores
+
 export const validarCPF = (cpf: string): boolean => {
   cpf = cpf.replace(/[^\d]/g, ''); // Remove caracteres não numéricos
   if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
@@ -20,7 +20,7 @@ export const validarCPF = (cpf: string): boolean => {
   return cpf === base + digito1 + digito2;
 };
 
-// Função para verificar se o email já está cadastrado
+
 export const verificarEmailCadastrado = (db: Connection, email: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const query = 'SELECT COUNT(*) AS count FROM usuarios WHERE email = ?';
@@ -31,7 +31,7 @@ export const verificarEmailCadastrado = (db: Connection, email: string): Promise
   });
 };
 
-// Função para criptografar a senha
+
 export const criptografarSenha = (senha: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     bcrypt.hash(senha, 10, (err, hash) => {
@@ -41,7 +41,7 @@ export const criptografarSenha = (senha: string): Promise<string> => {
   });
 };
 
-// Função para cadastrar um novo usuário
+
 export const cadastrarUsuario = (db: Connection, usuario: any): Promise<void> => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -57,8 +57,8 @@ export const cadastrarUsuario = (db: Connection, usuario: any): Promise<void> =>
       const hash = await criptografarSenha(usuario.senha);
 
       const query = `
-        INSERT INTO usuarios (cpf, email, nome, telefone, senha, id_workspace)
-        VALUES (?, ?, ?, ?, ?, NULL)
+        INSERT INTO usuarios (cpf, email, nome, telefone, senha)
+        VALUES (?, ?, ?, ?, ?)
       `;
       db.query(query, [usuario.cpf, usuario.email, usuario.nome, usuario.telefone, hash], (err) => {
         if (err) return reject(`Erro ao cadastrar o usuário: ${err.message}`);
@@ -69,7 +69,6 @@ export const cadastrarUsuario = (db: Connection, usuario: any): Promise<void> =>
     }
   });
 };
-
 
 export const loginUsuario = (db: Connection, email: string, senha: string): Promise<{ token: string; cpf: string }> => {
   return new Promise((resolve, reject) => {
@@ -88,7 +87,7 @@ export const loginUsuario = (db: Connection, email: string, senha: string): Prom
   });
 };
 
-// Função para atualizar um usuário
+
 export const atualizarUsuario = (db: Connection, cpf: string, dados: any): Promise<void> => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -119,7 +118,7 @@ export const atualizarUsuario = (db: Connection, cpf: string, dados: any): Promi
   });
 };
 
-// Função para deletar um usuário
+
 export const deletarUsuario = (db: Connection, cpf: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     const query = 'DELETE FROM usuarios WHERE cpf = ?';
@@ -130,18 +129,18 @@ export const deletarUsuario = (db: Connection, cpf: string): Promise<void> => {
   });
 };
 
-// Função para verificar se o usuário possui workspace atrelado
+
 export const verificarWorkspaceUsuario = (db: Connection, cpf: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
-    const query = 'SELECT id_workspace FROM usuarios WHERE cpf = ?';
+    const query = 'SELECT COUNT(*) AS count FROM workspace_usuarios WHERE cpf = ?';
     db.query(query, [cpf], (err, results: any) => {
       if (err) return reject(`Erro ao verificar workspace: ${err.message}`);
-      resolve(!!results[0]?.id_workspace);
+      resolve(results[0].count > 0);
     });
   });
 };
 
-// Função para listar todos os usuários
+
 export const listarUsuarios = (db: Connection): Promise<any[]> => {
   return new Promise((resolve, reject) => {
     const query = 'SELECT * FROM usuarios';
@@ -152,7 +151,7 @@ export const listarUsuarios = (db: Connection): Promise<any[]> => {
   });
 };
 
-// Função para buscar os dados de um usuário pelo CPF
+
 export const buscarUsuarioPorCPF = (db: Connection, cpf: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     const query = 'SELECT * FROM usuarios WHERE cpf = ?';

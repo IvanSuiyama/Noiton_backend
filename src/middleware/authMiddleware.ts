@@ -24,7 +24,7 @@ export const AuthMiddleware = (req: Request, res: Response, next: NextFunction):
   try {
     const decoded = jwt.verify(token, secret);
     console.log("Token decodificado com sucesso:", decoded);
-    (req as any).user = decoded; // Anexar usuário ao request
+    (req as any).user = decoded; // Inclui o CPF no req.user
     next();
   } catch (error) {
     console.error("Erro ao verificar token:", error);
