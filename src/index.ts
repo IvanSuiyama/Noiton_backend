@@ -1,6 +1,6 @@
 import express from 'express';
 import { createUsuarioTable, dropUsuarioTable } from './model/usuarioModel';
-import { createWorkspaceTable, dropWorkspaceTable, dropWorkspaceUsuariosTable } from './model/workModel';
+import { createWorkspaceTable, dropworkspace_tarefasTable, dropWorkspaceTable, dropWorkspaceUsuariosTable } from './model/workModel';
 import { createWorkspaceUsuariosTable } from './model/workModel';
 import { CreateTarefaTable, dropTarefaTable } from './model/tarefasModel';
 import { createCategoriaTable, dropCategoriaTable } from './model/categoriaModel';
@@ -30,26 +30,27 @@ connection.connect((err) => {
 
   try {
     // console.log('Excluindo tabelas existentes...');
-    // dropTarefaTable(connection);
-    // dropCategoriaTable(connection);
-    // dropUsuarioTable(connection);
-    // dropWorkspaceUsuariosTable(connection);
-    // dropWorkspaceTable(connection);
+    // dropworkspace_tarefasTable(connection); // Tabela que depende de tarefas e workspaces
+    // dropTarefaTable(connection); // Tabela que depende de categorias e workspaces
+    // dropWorkspaceUsuariosTable(connection); // Tabela que depende de workspaces e usuários
+    // dropWorkspaceTable(connection); // Tabela que depende de usuários
+    // dropCategoriaTable(connection); // Tabela independente
+    // dropUsuarioTable(connection); // Tabela independente
 
     console.log('Criando tabelas...');
-    createUsuarioTable(connection);
-    createCategoriaTable(connection);
-    createWorkspaceTable(connection);
-    createWorkspaceUsuariosTable(connection);
-    CreateTarefaTable(connection);
+    createUsuarioTable(connection); // Tabela independente
+    createCategoriaTable(connection); // Tabela independente
+    createWorkspaceTable(connection); // Tabela que depende de usuários
+    createWorkspaceUsuariosTable(connection); // Tabela que depende de workspaces e usuários
+    CreateTarefaTable(connection); // Tabela que depende de categorias e workspaces
 
   } catch (error) {
     console.error('Erro ao recriar tabelas:', error);
   }
 });
 
-const server = app.listen(port, '192.168.15.13', () => {
-  console.log(`Servidor rodando em http://192.168.15.13:${port}`); // IP WiFi
+const server = app.listen(port, '192.168.15.5', () => {
+  console.log(`Servidor rodando em http://192.168.15.5:${port}`); // IP WiFi
 });
 
 // const server = app.listen(port, '192.168.247.119', () => {

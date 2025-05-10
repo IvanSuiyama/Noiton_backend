@@ -10,11 +10,9 @@ export const createWorkspaceTable = (db: Connection) => {
   const query = `
     CREATE TABLE IF NOT EXISTS workspaces (
       id_workspace INT AUTO_INCREMENT PRIMARY KEY,
-      nome VARCHAR(255) NOT NULL,
-      cpf VARCHAR(11) NOT NULL,
-      FOREIGN KEY (cpf) REFERENCES usuarios(cpf)
+      nome VARCHAR(255) NOT NULL
     );
-  `;
+  `; // Corrigido: Adicionado fechamento correto da tabela
 
   db.query(query, (err) => {
     if (err) {
@@ -59,6 +57,16 @@ export const dropWorkspaceUsuariosTable = (db: Connection) => {
   db.query(query, (err) => {
     if (err) {
       console.error('Erro ao excluir a tabela workspace_usuarios:', err);
+    }
+  });
+};
+
+export const dropworkspace_tarefasTable = (db: Connection) => {
+  const query = `DROP TABLE IF EXISTS workspace_tarefas;`;
+
+  db.query(query, (err) => {
+    if (err) {
+      console.error('Erro ao excluir a tabela workspace_tarefas:', err);
     }
   });
 };
