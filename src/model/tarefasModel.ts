@@ -1,9 +1,8 @@
-import { Connection } from "mysql2";
+import { Pool } from 'pg';
 
 export interface Tarefa {
   id_tarefa: number;
   id_categoria: number;
-  id_workspace: number;
   titulo: string;
   data_inicio: Date;
   data_fim: Date;
@@ -12,36 +11,56 @@ export interface Tarefa {
   prioridade: 'baixa' | 'media' | 'alta';
 }
 
-export const CreateTarefaTable = (db: Connection) => {
+export const CreateTarefaTable = async (db: Pool) => {
   const createQuery = `
     CREATE TABLE IF NOT EXISTS tarefas (
-      id_tarefa INT AUTO_INCREMENT PRIMARY KEY,
-      titulo VARCHAR(100) NOT NULL,
-      data_inicio DATETIME NOT NULL,
-      data_fim DATETIME,
+      id_tarefa SERIAL PRIMARY KEY,
+      id_categoria INTEGER,
+      titulo VARCHAR(255) NOT NULL,
+      data_inicio TIMESTAMP NOT NULL,
+      data_fim TIMESTAMP,
       conteudo TEXT,
-      status ENUM('pendente', 'em andamento', 'concluída') DEFAULT 'pendente',
-      prioridade ENUM('baixa', 'media', 'alta') DEFAULT 'media',
-      id_categoria INT,
-      id_workspace INT,
-      FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
-      FOREIGN KEY (id_workspace) REFERENCES workspaces(id_workspace)
+      status VARCHAR(50),
+      prioridade VARCHAR(10)
     );
   `;
-
-  db.query(createQuery, (err) => {
-    if (err) {
-      console.error("Erro ao criar a tabela de tarefas:", err);
-    }
-  });
+  try {
+    await db.query(createQuery);
+  } catch (err) {
+    console.error("Erro ao criar a tabela de tarefas:", err);
+  }
 };
 
-export const dropTarefaTable = (db: Connection) => {
-  const query = `DROP TABLE IF EXISTS tarefas;`;
 
-  db.query(query, (err) => {
-    if (err) {
-      console.error("Erro ao excluir a tabela de tarefas:", err);
-    }
-  });
+export const createUsuarioTarefasTable = async (db: Pool) => {
+  const query = `
+    CREATE TABLE IF NOT EXISTS usuario_tarefas (
+      id SERIAL PRIMARY KEY,
+      cpf VARCHAR(11) NOT NULL,
+      id_tarefa INTEGER NOT NULL
+    );
+  `;
+  try {
+    await db.query(query);
+  } catch (err) {
+    console.error('Erro ao criar a tabela usuario_tarefas:', err);
+  }
+};
+
+export const dropTarefaTable = async (db: Pool) => {
+  const query = `DROP TABLE IF EXISTS tarefas;`;
+  try {
+    await db.query(query);
+  } catch (err) {
+    console.error("Erro ao excluir a tabela de tarefas:", err);
+  }
+};
+
+export const dropUsuarioTarefasTable = async (db: Pool) => {
+  const query = `DROP TABLE IF EXISTS usuario_tarefas;`;
+  try {
+    await db.query(query);
+  } catch (err) {
+    console.error('Erro ao excluir a tabela usuario_tarefas:', err);
+  }
 };

@@ -1,35 +1,24 @@
-import mysql from 'mysql2';
+import { Pool } from 'pg';
 import * as url from 'url';
 
 
-const connectionString = 'mysql://root:ErQflSPsSeTWgCTlZamKitkEgOeBunIU@nozomi.proxy.rlwy.net:38458/railway';
+const connectionString = 'postgresql://neondb_owner:npg_z8TajBX9uoGD@ep-polished-rain-a8jwhmrn-pooler.eastus2.azure.neon.tech/neondb?sslmode=require';
 
 
-const parsedUrl = url.parse(connectionString);
-
-
-const username = parsedUrl.auth?.split(':')[0] || '';
-const password = parsedUrl.auth?.split(':')[1] || '';
-const host = parsedUrl.hostname || '';
-const port = parsedUrl.port || '3306';
-const database = parsedUrl.pathname?.substring(1) || '';
-
-
-const connection = mysql.createConnection({
-  host: host,
-  user: username,
-  password: password,
-  database: database,
-  port: parseInt(port),
+const pool = new Pool({
+  connectionString,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
-connection.connect((err) => {
+pool.connect((err) => {
   if (err) {
     console.error('Erro ao conectar: ', err);
   } else {
-    console.log('Conectado ao banco de dados!');
+    console.log('Conectado ao banco de dados PostgreSQL!');
   }
 });
 
-export default connection;
+export default pool;
 

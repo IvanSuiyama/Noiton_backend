@@ -1,4 +1,4 @@
-import { Connection } from 'mysql2';
+import { Pool } from 'pg';
 
 
 export interface Usuario {
@@ -11,7 +11,7 @@ export interface Usuario {
 }
 
 
-export const createUsuarioTable = (db: Connection) => {
+export const createUsuarioTable = async (db: Pool) => {
   const query = `
     CREATE TABLE IF NOT EXISTS usuarios (
       cpf VARCHAR(11) PRIMARY KEY,
@@ -21,20 +21,18 @@ export const createUsuarioTable = (db: Connection) => {
       senha VARCHAR(255) NOT NULL
     );
   `;
-
-  db.query(query, (err) => {
-    if (err) {
-      console.error('Erro ao criar a tabela de usuários:', err);
-    }
-  });
+  try {
+    await db.query(query);
+  } catch (err) {
+    console.error('Erro ao criar a tabela de usuários:', err);
+  }
 };
 
-export const dropUsuarioTable = (db: Connection) => {
+export const dropUsuarioTable = async (db: Pool) => {
   const query = `DROP TABLE IF EXISTS usuarios;`;
-
-  db.query(query, (err) => {
-    if (err) {
-      console.error('Erro ao excluir a tabela de usuários:', err);
-    }
-  });
+  try {
+    await db.query(query);
+  } catch (err) {
+    console.error('Erro ao excluir a tabela de usuários:', err);
+  }
 };

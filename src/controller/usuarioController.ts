@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
+import pool from '../config/database';
 import * as usuarioService from '../service/usuarioService';
-import connection from '../config/database';
 
 export const cadastrarUsuario = async (req: Request, res: Response) => {
   try {
-    await usuarioService.cadastrarUsuario(connection, req.body);
+    await usuarioService.cadastrarUsuario(pool, req.body);
     res.status(201).send('Usuário cadastrado com sucesso.');
   } catch (error) {
     res.status(400).send(error);
@@ -13,7 +13,7 @@ export const cadastrarUsuario = async (req: Request, res: Response) => {
 
 export const loginUsuario = async (req: Request, res: Response) => {
   try {
-    const { token, cpf } = await usuarioService.loginUsuario(connection, req.body.email, req.body.senha);
+    const { token, cpf } = await usuarioService.loginUsuario(pool, req.body.email, req.body.senha);
     res.status(200).json({ token, cpf });
   } catch (error) {
     res.status(400).send(error);
@@ -22,7 +22,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
 
 export const atualizarUsuario = async (req: Request, res: Response) => {
   try {
-    await usuarioService.atualizarUsuario(connection, req.params.cpf, req.body);
+    await usuarioService.atualizarUsuario(pool, req.params.cpf, req.body);
     res.status(200).send('Usuário atualizado com sucesso.');
   } catch (error) {
     res.status(400).send(error);
@@ -31,7 +31,7 @@ export const atualizarUsuario = async (req: Request, res: Response) => {
 
 export const deletarUsuario = async (req: Request, res: Response) => {
   try {
-    await usuarioService.deletarUsuario(connection, req.params.cpf);
+    await usuarioService.deletarUsuario(pool, req.params.cpf);
     res.status(200).send('Usuário deletado com sucesso.');
   } catch (error) {
     res.status(400).send(error);
@@ -40,7 +40,7 @@ export const deletarUsuario = async (req: Request, res: Response) => {
 
 export const verificarWorkspaceUsuario = async (req: Request, res: Response) => {
   try {
-    const possuiWorkspace = await usuarioService.verificarWorkspaceUsuario(connection, req.params.cpf);
+    const possuiWorkspace = await usuarioService.verificarWorkspaceUsuario(pool, req.params.cpf);
     res.status(200).json({ possuiWorkspace });
   } catch (error) {
     res.status(400).send(error);
@@ -49,7 +49,7 @@ export const verificarWorkspaceUsuario = async (req: Request, res: Response) => 
 
 export const listarUsuarios = async (req: Request, res: Response) => {
   try {
-    const usuarios = await usuarioService.listarUsuarios(connection);
+    const usuarios = await usuarioService.listarUsuarios(pool);
     res.status(200).json(usuarios);
   } catch (error) {
     res.status(400).send(error);
@@ -58,7 +58,7 @@ export const listarUsuarios = async (req: Request, res: Response) => {
 
 export const buscarUsuarioPorCPF = async (req: Request, res: Response) => {
   try {
-    const usuario = await usuarioService.buscarUsuarioPorCPF(connection, req.params.cpf);
+    const usuario = await usuarioService.buscarUsuarioPorCPF(pool, req.params.cpf);
     res.status(200).json(usuario);
   } catch (error) {
     res.status(404).send(error);
