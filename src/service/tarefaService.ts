@@ -65,3 +65,12 @@ export const excluirTarefa = async (db: Pool, id_tarefa: number): Promise<void> 
   const query = 'DELETE FROM tarefas WHERE id_tarefa = $1';
   await db.query(query, [id_tarefa]);
 };
+
+export const atualizarStatusTarefa = async (db: Pool, id_tarefa: number, status: string): Promise<void> => {
+  const query = `
+    UPDATE tarefas
+    SET status = $1
+    WHERE id_tarefa = $2
+  `;
+  await db.query(query, [status, id_tarefa]);
+};

@@ -9,6 +9,7 @@ const asyncHandler = (fn: Function) => (req: any, res: any, next: any) => {
 
 router.post('/tarefa', asyncHandler(createTarefa));
 router.put('/tarefa/:id', asyncHandler(updateTarefa));
+router.put('/tarefa/:id/status', asyncHandler(updateTarefa));
 router.get('/tarefa/list', asyncHandler(listTarefas));
 router.delete('/tarefa/:id', asyncHandler(deleteTarefa));
 

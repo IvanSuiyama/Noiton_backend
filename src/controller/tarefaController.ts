@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import pool from '../config/database';
-import { cadastrarTarefa, editarTarefa, listarTarefas, excluirTarefa, associarTarefaUsuario } from '../service/tarefaService';
+import { cadastrarTarefa, editarTarefa, listarTarefas, excluirTarefa, associarTarefaUsuario, atualizarStatusTarefa } from '../service/tarefaService';
 
 // Função utilitária para pegar o CPF do usuário logado
 const getCpfFromRequest = (req: Request): string | undefined => {
@@ -65,5 +65,21 @@ export const deleteTarefa = async (req: Request, res: Response) => {
     res.status(200).json({ message: 'Tarefa excluída com sucesso.' });
   } catch (error) {
     res.status(500).json({ error: `Erro ao excluir a tarefa: ${error}` });
+  }
+};
+
+export const updateTarefaStatus = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!id || !status) {
+    return res.status(400).json({ error: 'O ID da tarefa e o novo status são obrigatórios.' });
+  }
+
+  try {
+    await atualizarStatusTarefa(pool, parseInt(id, 10), status);
+    res.status(200).json({ message: 'Status da tarefa atualizado com sucesso.' });
+  } catch (error) {
+    res.status(500).json({ error: `Erro ao atualizar o status da tarefa: ${error}` });
   }
 };
