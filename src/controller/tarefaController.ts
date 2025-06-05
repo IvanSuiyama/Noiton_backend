@@ -8,7 +8,7 @@ const getCpfFromRequest = (req: Request): string | undefined => {
 };
 
 export const createTarefa = async (req: Request, res: Response) => {
-  const { id_categoria, id_workspace, titulo, data_inicio, data_fim, conteudo, status, prioridade } = req.body;
+  const { id_categoria, titulo, data_inicio, data_fim, conteudo, status, prioridade } = req.body;
 
   if (!titulo || !data_inicio) {
     return res.status(400).json({ error: 'O título e a data de início são obrigatórios.' });
@@ -20,7 +20,7 @@ export const createTarefa = async (req: Request, res: Response) => {
   }
 
   try {
-    const id_tarefa = await cadastrarTarefa(pool, { id_categoria, id_workspace, titulo, data_inicio, data_fim, conteudo, status, prioridade });
+    const id_tarefa = await cadastrarTarefa(pool, { id_categoria, titulo, data_inicio, data_fim, conteudo, status, prioridade });
     await associarTarefaUsuario(pool, cpf, id_tarefa);
     res.status(201).json({ message: 'Tarefa cadastrada e associada ao usuário com sucesso.' });
   } catch (error) {
@@ -30,14 +30,14 @@ export const createTarefa = async (req: Request, res: Response) => {
 
 export const updateTarefa = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { id_categoria, id_workspace, titulo, data_inicio, data_fim, conteudo, status, prioridade } = req.body;
+  const { id_categoria, titulo, data_inicio, data_fim, conteudo, status, prioridade } = req.body;
 
   if (!id) {
     return res.status(400).json({ error: 'O ID da tarefa é obrigatório.' });
   }
 
   try {
-    await editarTarefa(pool, parseInt(id, 10), { id_categoria, id_workspace, titulo, data_inicio, data_fim, conteudo, status, prioridade });
+    await editarTarefa(pool, parseInt(id, 10), { id_categoria, titulo, data_inicio, data_fim, conteudo, status, prioridade });
     res.status(200).json({ message: 'Tarefa atualizada com sucesso.' });
   } catch (error) {
     res.status(500).json({ error: `Erro ao atualizar a tarefa: ${error}` });

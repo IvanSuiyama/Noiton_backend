@@ -2,7 +2,6 @@ import { Pool } from 'pg';
 
 interface Tarefa {
   id_categoria?: number;
-  id_workspace?: number;
   titulo: string;
   data_inicio: Date;
   data_fim?: Date;
@@ -13,13 +12,12 @@ interface Tarefa {
 
 export const cadastrarTarefa = async (db: Pool, tarefa: Tarefa): Promise<number> => {
   const query = `
-    INSERT INTO tarefas (id_categoria, id_workspace, titulo, data_inicio, data_fim, conteudo, status, prioridade)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    INSERT INTO tarefas (id_categoria, titulo, data_inicio, data_fim, conteudo, status, prioridade)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
     RETURNING id_tarefa
   `;
   const result = await db.query(query, [
     tarefa.id_categoria ?? null,
-    tarefa.id_workspace ?? null,
     tarefa.titulo,
     tarefa.data_inicio,
     tarefa.data_fim ?? null,
@@ -42,12 +40,11 @@ export const associarTarefaUsuario = async (db: Pool, cpf: string, id_tarefa: nu
 export const editarTarefa = async (db: Pool, id_tarefa: number, tarefa: Tarefa): Promise<void> => {
   const query = `
     UPDATE tarefas
-    SET id_categoria = $1, id_workspace = $2, titulo = $3, data_inicio = $4, data_fim = $5, conteudo = $6, status = $7, prioridade = $8
-    WHERE id_tarefa = $9
+    SET id_categoria = $1, titulo = $2, data_inicio = $3, data_fim = $4, conteudo = $5, status = $6, prioridade = $7
+    WHERE id_tarefa = $8
   `;
   await db.query(query, [
     tarefa.id_categoria ?? null,
-    tarefa.id_workspace ?? null,
     tarefa.titulo,
     tarefa.data_inicio,
     tarefa.data_fim ?? null,

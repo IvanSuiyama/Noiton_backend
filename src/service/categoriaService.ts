@@ -36,3 +36,25 @@ export const listarCategorias = async (db: Pool): Promise<any[]> => {
   const result = await db.query(query);
   return result.rows;
 };
+
+
+interface Categoria {
+  nome: string;
+  cpf_user: string;
+}
+
+export const criarCategoria = async (db: Pool, categoria: Categoria): Promise<number> => {
+  const query = `
+    INSERT INTO categorias (nome, cpf_user)
+    VALUES ($1, $2)
+    RETURNING id_categoria
+  `;
+  const result = await db.query(query, [categoria.nome, categoria.cpf_user]);
+  return result.rows[0].id_categoria;
+};
+
+export const listarCategoriasPorUsuario = async (db: Pool, cpf_user: string): Promise<any[]> => {
+  const query = 'SELECT * FROM categorias WHERE cpf_user = $1';
+  const result = await db.query(query, [cpf_user]);
+  return result.rows;
+};

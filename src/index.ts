@@ -19,13 +19,14 @@ async function createTables() {
 }
 
 // Função para excluir tabelas na ordem correta (inversa)
-/// Descomente para usar quando necessário
-// async function dropTables() {
-//   await dropUsuarioTarefasTable(pool);
-//   await dropTarefaTable(pool);
-//   await dropCategoriaTable(pool);
-//   await dropUsuarioTable(pool);
-// }
+// / Descomente para usar quando necessário
+
+async function dropTables() {
+  await dropUsuarioTarefasTable(pool);
+  await dropTarefaTable(pool);
+  await dropCategoriaTable(pool);
+  await dropUsuarioTable(pool);
+}
 
 createTables().then(() => {
   console.log('Tabelas criadas com sucesso!');
@@ -33,7 +34,8 @@ createTables().then(() => {
   console.error('Erro ao criar tabelas:', err);
 });
 
-// // Para excluir as tabelas, descomente e execute a função abaixo:
+
+
 // dropTables().then(() => {
 //   console.log('Tabelas excluídas com sucesso!');
 // }).catch((err) => {
@@ -45,7 +47,6 @@ app.use(express.json());
 // Rotas públicas (não exigem autenticação)
 app.use('/api', usuarioRoutes);
 
-// Rotas protegidas (exigem autenticação)
 app.use(AuthMiddleware);
 app.use('/api', categoriaRoutes);
 app.use('/api', tarefaRoutes);

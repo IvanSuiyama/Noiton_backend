@@ -1,19 +1,28 @@
 import { Request, Response } from 'express';
 import pool from '../config/database';
-import { cadastrarCategoria, excluirCategoria, editarNomeCategoria, obterCategoriaPorId, listarCategorias } from '../service/categoriaService';
+import { cadastrarCategoria, excluirCategoria, editarNomeCategoria, obterCategoriaPorId, listarCategorias, criarCategoria, listarCategoriasPorUsuario } from '../service/categoriaService';
+
+// Função utilitária para pegar o CPF do usuário logado
+const getCpfFromRequest = (req: Request): string | undefined => {
+  return (req as any).user?.cpf;
+};
 
 export const createCategoria = async (req: Request, res: Response) => {
   const { nome } = req.body;
+  const cpf_user = getCpfFromRequest(req);
 
   if (!nome) {
     return res.status(400).json({ error: 'O nome da categoria é obrigatório.' });
   }
+  if (!cpf_user) {
+    return res.status(401).json({ error: 'Usuário não autenticado.' });
+  }
 
   try {
-    await cadastrarCategoria(pool, nome);
-    res.status(201).json({ message: 'Categoria cadastrada com sucesso.' });
+    const id_categoria = await criarCategoria(pool, { nome, cpf_user });
+    res.status(201).json({ message: 'Categoria criada com sucesso.', id_categoria });
   } catch (error) {
-    res.status(500).json({ error: `Erro ao cadastrar a categoria: ${error}` });
+    res.status(500).json({ error: `Erro ao criar a categoria: ${error}` });
   }
 };
 
@@ -63,9 +72,13 @@ export const getCategoriaById = async (req: Request, res: Response) => {
   }
 };
 
-export const listCategorias = async (_req: Request, res: Response) => {
+export const listCategorias = async (req: Request, res: Response) => {
+  const cpf_user = getCpfFromRequest(req);
+  if (!cpf_user) {
+    return res.status(401).json({ error: 'Usuário não autenticado.' });
+  }
   try {
-    const categorias = await listarCategorias(pool);
+    const categorias = await listarCategoriasPorUsuario(pool, cpf_user);
     res.status(200).json(categorias);
   } catch (error) {
     res.status(500).json({ error: `Erro ao listar as categorias: ${error}` });
