@@ -4,7 +4,7 @@ import tarefaRoutes from './routes/tarefaRoutes';
 import categoriaRoutes from './routes/categoriaRoutes';
 import pool from './config/database';
 import { createUsuarioTable, dropUsuarioTable } from './model/usuarioModel';
-import { createCategoriaTable, dropCategoriaTable } from './model/categoriaModel';
+import { createCategoriaTable, dropCategoriaTable, createCategoriaTarefasTable, dropCategoriaTarefasTable } from './model/categoriaModel';
 import { CreateTarefaTable, createUsuarioTarefasTable, dropTarefaTable, dropUsuarioTarefasTable } from './model/tarefasModel';
 import { AuthMiddleware } from './middleware/authMiddleware';
 
@@ -16,6 +16,7 @@ async function createTables() {
   await createCategoriaTable(pool);
   await CreateTarefaTable(pool);
   await createUsuarioTarefasTable(pool);
+  await createCategoriaTarefasTable(pool);
 }
 
 // Função para excluir tabelas na ordem correta (inversa)
@@ -24,6 +25,7 @@ async function createTables() {
 async function dropTables() {
   await dropUsuarioTarefasTable(pool);
   await dropTarefaTable(pool);
+  await dropCategoriaTarefasTable(pool);
   await dropCategoriaTable(pool);
   await dropUsuarioTable(pool);
 }

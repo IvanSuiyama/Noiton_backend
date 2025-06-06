@@ -12,5 +12,6 @@ router.delete('/categoria/:id', asyncHandler(deleteCategoria));
 router.put('/categoria/:id', asyncHandler(updateCategoriaName));
 router.get('/categoria/:id', asyncHandler(getCategoriaById));
 router.get('/categorialist', asyncHandler(listCategorias));
+router.get('/categoria/list', asyncHandler(listCategorias));
 
 export default router;

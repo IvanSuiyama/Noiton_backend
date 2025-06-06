@@ -2,7 +2,6 @@ import { Pool } from 'pg';
 
 export interface Tarefa {
   id_tarefa: number;
-  id_categoria: number;
   titulo: string;
   data_inicio: Date;
   data_fim: Date;
@@ -15,7 +14,6 @@ export const CreateTarefaTable = async (db: Pool) => {
   const createQuery = `
     CREATE TABLE IF NOT EXISTS tarefas (
       id_tarefa SERIAL PRIMARY KEY,
-      id_categoria INTEGER,
       titulo VARCHAR(255) NOT NULL,
       data_inicio TIMESTAMP NOT NULL,
       data_fim TIMESTAMP,

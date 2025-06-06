@@ -2,9 +2,10 @@ import { Pool } from 'pg';
 
 
 // Cadastrar categoria
-export const cadastrarCategoria = async (db: Pool, nome: string): Promise<void> => {
-  const query = 'INSERT INTO categorias (nome) VALUES ($1)';
-  await db.query(query, [nome]);
+export const cadastrarCategoria = async (db: Pool, categoria: { nome: string, cpf_user: string }): Promise<number> => {
+  const query = 'INSERT INTO categorias (nome, cpf_user) VALUES ($1, $2) RETURNING id_categoria';
+  const result = await db.query(query, [categoria.nome, categoria.cpf_user]);
+  return result.rows[0].id_categoria;
 };
 
 
