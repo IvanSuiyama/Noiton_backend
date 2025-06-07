@@ -77,9 +77,15 @@ export const updateTarefa = async (req: Request, res: Response) => {
   }
 };
 
-export const listTarefas = async (_req: Request, res: Response) => {
+export const listTarefas = async (req: Request, res: Response) => {
   try {
-    const tarefas = await listarTarefas(pool);
+    // Filtros de query string
+    const { prazoFinal, semPrazo } = req.query;
+    const filtros: any = {};
+    if (prazoFinal) filtros.prazoFinal = prazoFinal;
+    if (typeof semPrazo === 'string' && semPrazo === 'true') filtros.semPrazo = true;
+
+    const tarefas = await listarTarefas(pool, filtros);
     // Para cada tarefa, buscar as categorias associadas
     const tarefasComCategorias = await Promise.all(
       tarefas.map(async (tarefa) => {

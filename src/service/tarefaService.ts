@@ -82,9 +82,26 @@ export const editarTarefa = async (db: Pool, id_tarefa: number, tarefa: Omit<Tar
   ]);
 };
 
-export const listarTarefas = async (db: Pool): Promise<any[]> => {
-  const query = 'SELECT * FROM tarefas';
-  const result = await db.query(query);
+export const listarTarefas = async (db: Pool, filtros?: { prazoFinal?: string, semPrazo?: boolean }): Promise<any[]> => {
+  let query = 'SELECT * FROM tarefas';
+  const params: any[] = [];
+  const where: string[] = [];
+
+  if (filtros) {
+    if (filtros.prazoFinal) {
+      where.push('data_fim::date = $' + (params.length + 1));
+      params.push(filtros.prazoFinal);
+    }
+    if (filtros.semPrazo) {
+      where.push('data_fim IS NULL');
+    }
+  }
+
+  if (where.length > 0) {
+    query += ' WHERE ' + where.join(' AND ');
+  }
+
+  const result = await db.query(query, params);
   return result.rows;
 };
 
