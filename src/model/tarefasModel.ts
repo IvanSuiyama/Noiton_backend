@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 
+// --- TAREFAS ---
 export interface Tarefa {
   id_tarefa: number;
   titulo: string;
@@ -60,5 +61,40 @@ export const dropUsuarioTarefasTable = async (db: Pool) => {
     await db.query(query);
   } catch (err) {
     console.error('Erro ao excluir a tabela usuario_tarefas:', err);
+  }
+};
+
+// --- ROTINAS ---
+export interface Rotina {
+  id_rotina: number;
+  id_tarefa_base: number;
+  dias_semana: string; // Ex: "seg,ter,qua"
+  data_fim?: Date;
+  ativa: boolean;
+}
+
+export const createRotinasTable = async (db: Pool) => {
+  const query = `
+    CREATE TABLE IF NOT EXISTS rotinas (
+      id_rotina SERIAL PRIMARY KEY,
+      id_tarefa_base INTEGER REFERENCES tarefas(id_tarefa) ON DELETE CASCADE,
+      dias_semana VARCHAR(20) NOT NULL,
+      data_fim DATE,
+      ativa BOOLEAN DEFAULT TRUE
+    );
+  `;
+  try {
+    await db.query(query);
+  } catch (err) {
+    console.error('Erro ao criar a tabela rotinas:', err);
+  }
+};
+
+export const dropRotinasTable = async (db: Pool) => {
+  const query = `DROP TABLE IF EXISTS rotinas;`;
+  try {
+    await db.query(query);
+  } catch (err) {
+    console.error('Erro ao excluir a tabela rotinas:', err);
   }
 };
