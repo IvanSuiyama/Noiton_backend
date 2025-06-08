@@ -7,6 +7,7 @@ import rotinaRoutes from './routes/rotinaRoutes';
 import notificacaoRoutes from './routes/notificacaoRoutes';
 import emailRoutes from './routes/emailRoutes';
 import tarefaArquivoRoutes from './routes/tarefaArquivoRoutes';
+import usuarioProgressoRoutes from './routes/usuarioProgressoRoutes';
 import pool from './config/database';
 import { createUsuarioTable, dropUsuarioTable } from './model/usuarioModel';
 import { createCategoriaTable, dropCategoriaTable, createCategoriaTarefasTable, dropCategoriaTarefasTable } from './model/categoriaModel';
@@ -15,6 +16,7 @@ import { createNotificacoesTable, dropNotificacoesTable } from './model/notifica
 import { AuthMiddleware } from './middleware/authMiddleware';
 import { monitorarNotificacoes } from './controller/emailController';
 import { createTarefaArquivosTable, dropTarefaArquivosTable } from './model/tarefaArquivoModel';
+import { createUsuarioProgressoTable, dropUsuarioProgressoTable } from './model/usuarioProgressoModel';
 
 const app = express();
 const port = parseInt(process.env.PORT || '4000', 10);
@@ -28,6 +30,7 @@ async function createTables() {
   await createCategoriaTarefasTable(pool);
   await createNotificacoesTable(pool); // criar notificações por último
   await createTarefaArquivosTable(pool); // criar tabela de arquivos de tarefas
+  await createUsuarioProgressoTable(pool); // criar progresso do usuário após usuários
 }
 
 // Função para excluir tabelas na ordem correta (inversa)
@@ -40,6 +43,7 @@ async function dropTables() {
   await dropRotinasTable(pool); // <-- dropar rotinas ANTES de tarefas
   await dropTarefaArquivosTable(pool); // dropar arquivos antes de tarefas
   await dropTarefaTable(pool);
+  await dropUsuarioProgressoTable(pool); // dropar progresso do usuário antes de usuarios
   await dropCategoriaTable(pool);
   await dropUsuarioTable(pool);
 }
@@ -70,6 +74,7 @@ app.use('/api', rotinaRoutes); // <-- adicionar rotinas
 app.use('/api', notificacaoRoutes); // <-- adicionar rotas de notificações
 app.use('/api', emailRoutes); // adicionar rotas de email
 app.use('/api', tarefaArquivoRoutes); // adicionar rotas de arquivos de tarefas
+app.use('/api', usuarioProgressoRoutes); // adicionar rotas de progresso do usuário
 
 monitorarNotificacoes(); // inicia monitoramento automático
 

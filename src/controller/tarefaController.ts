@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import pool from '../config/database';
 import { cadastrarTarefa, editarTarefa, listarTarefas, excluirTarefa, associarTarefaUsuario, atualizarStatusTarefa, buscarTarefaPorId, associarTarefaCategoria, removerAssociacoesTarefaCategoria, buscarCategoriasPorTarefa, listarSubtarefas, listarTarefasPorUsuario } from '../service/tarefaService';
+import { atualizarProgresso, inicializarProgressoUsuario } from '../service/usuarioProgressoService';
 
 // Função utilitária para pegar o CPF do usuário logado
 const getCpfFromRequest = (req: Request): string | undefined => {
@@ -38,6 +39,9 @@ export const createTarefa = async (req: Request, res: Response) => {
     const id_tarefa = await cadastrarTarefa(pool, { titulo, data_inicio, data_fim, conteudo, status, prioridade, id_pai });
     // Associa tarefa ao usuário
     await associarTarefaUsuario(pool, cpf, id_tarefa);
+    // Atualiza progresso do usuário
+    await inicializarProgressoUsuario(pool, cpf);
+    await atualizarProgresso(pool, cpf, 'criadas', new Date(data_inicio));
     // Associa tarefa a todas as categorias informadas
     for (const cat of categorias) {
       await associarTarefaCategoria(pool, cat.id_categoria, id_tarefa);
@@ -111,7 +115,16 @@ export const deleteTarefa = async (req: Request, res: Response) => {
   }
 
   try {
+    // Busca o cpf do usuário associado à tarefa
+    const result = await pool.query('SELECT cpf FROM usuario_tarefas WHERE id_tarefa = $1 LIMIT 1', [id]);
+    const cpf = result.rows[0]?.cpf;
+    // Busca data de criação da tarefa
+    const tarefa = await pool.query('SELECT data_inicio FROM tarefas WHERE id_tarefa = $1', [id]);
+    const dataCriacao = tarefa.rows[0]?.data_inicio;
     await excluirTarefa(pool, parseInt(id, 10));
+    if (cpf && dataCriacao) {
+      await atualizarProgresso(pool, cpf, 'apagadas', new Date());
+    }
     res.status(200).json({ message: 'Tarefa excluída com sucesso.' });
   } catch (error) {
     res.status(500).json({ error: `Erro ao excluir a tarefa: ${error}` });
@@ -128,6 +141,15 @@ export const updateTarefaStatus = async (req: Request, res: Response) => {
 
   try {
     await atualizarStatusTarefa(pool, parseInt(id, 10), status);
+    // Atualiza progresso se for concluída
+    if (status === 'concluida' || status === 'concluída') {
+      // Busca o cpf do usuário associado à tarefa
+      const result = await pool.query('SELECT cpf FROM usuario_tarefas WHERE id_tarefa = $1 LIMIT 1', [id]);
+      const cpf = result.rows[0]?.cpf;
+      if (cpf) {
+        await atualizarProgresso(pool, cpf, 'concluidas', new Date());
+      }
+    }
     res.status(200).json({ message: 'Status da tarefa atualizado com sucesso.' });
   } catch (error) {
     res.status(500).json({ error: `Erro ao atualizar o status da tarefa: ${error}` });
