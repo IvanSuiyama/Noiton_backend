@@ -9,6 +9,7 @@ export interface Tarefa {
   conteudo: string;
   status: string;
   prioridade: 'baixa' | 'media' | 'alta';
+  id_pai?: number; // id da tarefa pai para subtarefas
 }
 
 export const CreateTarefaTable = async (db: Pool) => {
@@ -20,7 +21,8 @@ export const CreateTarefaTable = async (db: Pool) => {
       data_fim TIMESTAMP,
       conteudo TEXT,
       status VARCHAR(50),
-      prioridade VARCHAR(10)
+      prioridade VARCHAR(10),
+      id_pai INTEGER REFERENCES tarefas(id_tarefa)
     );
   `;
   try {

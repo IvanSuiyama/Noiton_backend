@@ -8,6 +8,7 @@ interface Tarefa {
   conteudo?: string;
   status?: string;
   prioridade?: 'baixa' | 'media' | 'alta';
+  id_pai?: number; // id da tarefa pai para subtarefas
 }
 
 function parseDateToBrazil(date: string | Date | undefined): Date | null {
@@ -26,12 +27,12 @@ function parseDateToBrazil(date: string | Date | undefined): Date | null {
   return date;
 }
 
-export const cadastrarTarefa = async (db: Pool, tarefa: Omit<Tarefa, 'id_categoria'>): Promise<number> => {
+export const cadastrarTarefa = async (db: Pool, tarefa: Omit<Tarefa, 'id_categoria'> & { id_pai?: number }): Promise<number> => {
   const data_inicio = parseDateToBrazil(tarefa.data_inicio);
   const data_fim = parseDateToBrazil(tarefa.data_fim);
   const query = `
-    INSERT INTO tarefas (titulo, data_inicio, data_fim, conteudo, status, prioridade)
-    VALUES ($1, $2, $3, $4, $5, $6)
+    INSERT INTO tarefas (titulo, data_inicio, data_fim, conteudo, status, prioridade, id_pai)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
     RETURNING id_tarefa
   `;
   const result = await db.query(query, [
@@ -40,7 +41,8 @@ export const cadastrarTarefa = async (db: Pool, tarefa: Omit<Tarefa, 'id_categor
     data_fim,
     tarefa.conteudo ?? null,
     tarefa.status ?? null,
-    tarefa.prioridade ?? null
+    tarefa.prioridade ?? null,
+    tarefa.id_pai ?? null
   ]);
   return result.rows[0].id_tarefa;
 };
@@ -140,5 +142,12 @@ export const buscarCategoriasPorTarefa = async (db: Pool, id_tarefa: number): Pr
     WHERE ct.id_tarefa = $1
   `;
   const result = await db.query(query, [id_tarefa]);
+  return result.rows;
+};
+
+// Listar subtarefas de uma tarefa pai
+export const listarSubtarefas = async (db: Pool, id_pai: number): Promise<any[]> => {
+  const query = 'SELECT * FROM tarefas WHERE id_pai = $1';
+  const result = await db.query(query, [id_pai]);
   return result.rows;
 };

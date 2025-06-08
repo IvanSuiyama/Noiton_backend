@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import pool from '../config/database';
-import { cadastrarTarefa, editarTarefa, listarTarefas, excluirTarefa, associarTarefaUsuario, atualizarStatusTarefa, buscarTarefaPorId, associarTarefaCategoria, removerAssociacoesTarefaCategoria, buscarCategoriasPorTarefa } from '../service/tarefaService';
+import { cadastrarTarefa, editarTarefa, listarTarefas, excluirTarefa, associarTarefaUsuario, atualizarStatusTarefa, buscarTarefaPorId, associarTarefaCategoria, removerAssociacoesTarefaCategoria, buscarCategoriasPorTarefa, listarSubtarefas } from '../service/tarefaService';
 
 // Função utilitária para pegar o CPF do usuário logado
 const getCpfFromRequest = (req: Request): string | undefined => {
@@ -8,7 +8,7 @@ const getCpfFromRequest = (req: Request): string | undefined => {
 };
 
 export const createTarefa = async (req: Request, res: Response) => {
-  let { categorias, titulo, data_inicio, data_fim, conteudo, status, prioridade } = req.body;
+  let { categorias, titulo, data_inicio, data_fim, conteudo, status, prioridade, id_pai } = req.body;
 
   if (!titulo) {
     return res.status(400).json({ error: 'O título é obrigatório.' });
@@ -35,7 +35,7 @@ export const createTarefa = async (req: Request, res: Response) => {
 
   try {
     // Cria a tarefa
-    const id_tarefa = await cadastrarTarefa(pool, { titulo, data_inicio, data_fim, conteudo, status, prioridade });
+    const id_tarefa = await cadastrarTarefa(pool, { titulo, data_inicio, data_fim, conteudo, status, prioridade, id_pai });
     // Associa tarefa ao usuário
     await associarTarefaUsuario(pool, cpf, id_tarefa);
     // Associa tarefa a todas as categorias informadas
@@ -143,5 +143,18 @@ export const getTarefaById = async (req: Request, res: Response) => {
     res.status(200).json(tarefa);
   } catch (error) {
     res.status(500).json({ error: `Erro ao buscar a tarefa: ${error}` });
+  }
+};
+
+export const getSubtarefas = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ error: 'O ID da tarefa pai é obrigatório.' });
+  }
+  try {
+    const subtarefas = await listarSubtarefas(pool, Number(id));
+    res.status(200).json(subtarefas);
+  } catch (error) {
+    res.status(500).json({ error: `Erro ao listar subtarefas: ${error}` });
   }
 };
