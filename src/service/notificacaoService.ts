@@ -22,3 +22,19 @@ export const listarNotificacoes = async (): Promise<Notificacao[]> => {
     return [];
   }
 };
+
+export const listarNotificacoesPorUsuario = async (cpf: string): Promise<Notificacao[]> => {
+  const query = `
+    SELECT n.* FROM notificacoes n
+    INNER JOIN usuario_tarefas ut ON ut.id_tarefa = n.id_tarefa
+    WHERE ut.cpf = $1
+    ORDER BY n.data DESC;
+  `;
+  try {
+    const { rows } = await pool.query(query, [cpf]);
+    return rows;
+  } catch (err) {
+    console.log('Erro ao listar notificações por usuário:', err);
+    return [];
+  }
+};

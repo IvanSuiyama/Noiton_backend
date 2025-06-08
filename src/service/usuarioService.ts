@@ -112,3 +112,12 @@ export const buscarUsuarioPorCPF = async (db: Pool, cpf: string): Promise<any> =
   if (result.rows.length === 0) throw 'Usuário não encontrado.';
   return result.rows[0];
 };
+
+
+export const buscarUsuarioPorEmail = async (db: Pool, email: string): Promise<any> => {
+  // Busca real no banco de dados pelo e-mail
+  const query = 'SELECT * FROM usuarios WHERE email = $1';
+  const result = await db.query(query, [email]);
+  if (result.rows.length === 0) throw 'Usuário não encontrado.';
+  return result.rows[0];
+};

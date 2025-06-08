@@ -151,3 +151,23 @@ export const listarSubtarefas = async (db: Pool, id_pai: number): Promise<any[]>
   const result = await db.query(query, [id_pai]);
   return result.rows;
 };
+
+export const listarTarefasPorUsuario = async (db: Pool, cpf: string, filtros?: { prazoFinal?: string, semPrazo?: boolean }): Promise<any[]> => {
+  let query = `SELECT t.* FROM tarefas t
+    INNER JOIN usuario_tarefas ut ON ut.id_tarefa = t.id_tarefa
+    WHERE ut.cpf = $1`;
+  const params: any[] = [cpf];
+
+  if (filtros) {
+    if (filtros.prazoFinal) {
+      query += ' AND t.data_fim::date = $' + (params.length + 1);
+      params.push(filtros.prazoFinal);
+    }
+    if (filtros.semPrazo) {
+      query += ' AND t.data_fim IS NULL';
+    }
+  }
+
+  const result = await db.query(query, params);
+  return result.rows;
+};

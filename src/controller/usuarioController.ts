@@ -64,3 +64,17 @@ export const buscarUsuarioPorCPF = async (req: Request, res: Response) => {
     res.status(404).send(error);
   }
 };
+
+export const buscarUsuarioPorEmail = async (req: Request, res: Response) => {
+  console.log('Controller buscarUsuarioPorEmail chamado. Params:', req.params);
+  try {
+    const email = req.params.email;
+    if (!email) {
+      return res.status(400).json({ error: 'E-mail é obrigatório.' });
+    }
+    const usuario = await usuarioService.buscarUsuarioPorEmail(pool, String(email));
+    res.status(200).json(usuario);
+  } catch (error) {
+    res.status(404).json({ error: 'Usuário não encontrado.' });
+  }
+};

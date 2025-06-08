@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import pool from '../config/database';
-import { cadastrarTarefa, editarTarefa, listarTarefas, excluirTarefa, associarTarefaUsuario, atualizarStatusTarefa, buscarTarefaPorId, associarTarefaCategoria, removerAssociacoesTarefaCategoria, buscarCategoriasPorTarefa, listarSubtarefas } from '../service/tarefaService';
+import { cadastrarTarefa, editarTarefa, listarTarefas, excluirTarefa, associarTarefaUsuario, atualizarStatusTarefa, buscarTarefaPorId, associarTarefaCategoria, removerAssociacoesTarefaCategoria, buscarCategoriasPorTarefa, listarSubtarefas, listarTarefasPorUsuario } from '../service/tarefaService';
 
 // Função utilitária para pegar o CPF do usuário logado
 const getCpfFromRequest = (req: Request): string | undefined => {
@@ -79,13 +79,17 @@ export const updateTarefa = async (req: Request, res: Response) => {
 
 export const listTarefas = async (req: Request, res: Response) => {
   try {
-    // Filtros de query string
+    // Sempre exige o CPF do usuário autenticado
+    const cpf = req.query.cpf || getCpfFromRequest(req);
+    if (!cpf) {
+      return res.status(401).json({ error: 'Usuário não autenticado.' });
+    }
     const { prazoFinal, semPrazo } = req.query;
     const filtros: any = {};
     if (prazoFinal) filtros.prazoFinal = prazoFinal;
     if (typeof semPrazo === 'string' && semPrazo === 'true') filtros.semPrazo = true;
 
-    const tarefas = await listarTarefas(pool, filtros);
+    const tarefas = await listarTarefasPorUsuario(pool, String(cpf), filtros);
     // Para cada tarefa, buscar as categorias associadas
     const tarefasComCategorias = await Promise.all(
       tarefas.map(async (tarefa) => {

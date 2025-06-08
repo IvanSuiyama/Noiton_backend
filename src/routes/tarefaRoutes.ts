@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { createTarefa, updateTarefa, listTarefas, deleteTarefa, getTarefaById, updateTarefaStatus, getSubtarefas } from '../controller/tarefaController';
+import { compartilharTarefa } from '../controller/tarefaCompartilharController';
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.get('/tarefa/list', asyncHandler(listTarefas));
 router.delete('/tarefa/:id', asyncHandler(deleteTarefa));
 router.get('/tarefa/:id', asyncHandler(getTarefaById));
 router.get('/tarefa/:id/subtarefas', asyncHandler(getSubtarefas));
+router.post('/tarefa/compartilhar', asyncHandler(compartilharTarefa));
 
 export default router;

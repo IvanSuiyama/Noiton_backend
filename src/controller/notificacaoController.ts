@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { criarNotificacao, listarNotificacoes } from '../service/notificacaoService';
+import { criarNotificacao, listarNotificacoesPorUsuario } from '../service/notificacaoService';
 
 export const criarNotificacaoController = async (req: Request, res: Response) => {
   const { id_tarefa, mensagem } = req.body;
@@ -14,7 +14,11 @@ export const criarNotificacaoController = async (req: Request, res: Response) =>
   }
 };
 
-export const listarNotificacoesController = async (_req: Request, res: Response) => {
-  const notificacoes = await listarNotificacoes();
+export const listarNotificacoesController = async (req: Request, res: Response) => {
+  const cpf = req.query.cpf || (req as any).user?.cpf;
+  if (!cpf) {
+    return res.status(401).json({ error: 'Usuário não autenticado.' });
+  }
+  const notificacoes = await listarNotificacoesPorUsuario(String(cpf));
   return res.status(200).json(notificacoes);
 };
