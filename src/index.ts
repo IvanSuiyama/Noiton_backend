@@ -3,10 +3,12 @@ import usuarioRoutes from './routes/usuarioRoutes';
 import tarefaRoutes from './routes/tarefaRoutes';
 import categoriaRoutes from './routes/categoriaRoutes';
 import rotinaRoutes from './routes/rotinaRoutes';
+import notificacaoRoutes from './routes/notificacaoRoutes';
 import pool from './config/database';
 import { createUsuarioTable, dropUsuarioTable } from './model/usuarioModel';
 import { createCategoriaTable, dropCategoriaTable, createCategoriaTarefasTable, dropCategoriaTarefasTable } from './model/categoriaModel';
 import { CreateTarefaTable, createUsuarioTarefasTable, dropTarefaTable, dropUsuarioTarefasTable, createRotinasTable, dropRotinasTable } from './model/tarefasModel';
+import { createNotificacoesTable, dropNotificacoesTable } from './model/notificacaoModel';
 import { AuthMiddleware } from './middleware/authMiddleware';
 
 const app = express();
@@ -19,12 +21,14 @@ async function createTables() {
   await createRotinasTable(pool); // <-- criar rotinas ANTES da usuario_tarefas
   await createUsuarioTarefasTable(pool);
   await createCategoriaTarefasTable(pool);
+  await createNotificacoesTable(pool); // criar notificações por último
 }
 
 // Função para excluir tabelas na ordem correta (inversa)
 // / Descomente para usar quando necessário
 
 async function dropTables() {
+  await dropNotificacoesTable(pool); // dropar notificações primeiro
   await dropUsuarioTarefasTable(pool);
   await dropCategoriaTarefasTable(pool);
   await dropRotinasTable(pool); // <-- dropar rotinas ANTES de tarefas
@@ -56,6 +60,7 @@ app.use(AuthMiddleware);
 app.use('/api', categoriaRoutes);
 app.use('/api', tarefaRoutes);
 app.use('/api', rotinaRoutes); // <-- adicionar rotinas
+app.use('/api', notificacaoRoutes); // <-- adicionar rotas de notificações
 
 
 
